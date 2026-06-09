@@ -2,6 +2,8 @@
 
 Telegram Mini App for [Digital Oracle](https://github.com/YehhiAleksandra/digital-oracle) — quick horoscope and numerology **without LLM** (client-side math, same logic as [astro-core](https://github.com/YehhiAleksandra/astro-core)).
 
+**Live:** [zinaida-mini-app.vercel.app](https://zinaida-mini-app.vercel.app/)
+
 ## Features
 
 - ⭐ Pick zodiac sign → daily hint + share to Telegram
