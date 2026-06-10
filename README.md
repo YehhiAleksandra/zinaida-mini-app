@@ -1,6 +1,6 @@
 # zinaida-mini-app
 
-Telegram Mini App for [Digital Oracle](https://github.com/YehhiAleksandra/digital-oracle) — quick horoscope and numerology **without LLM** (client-side math, same logic as [astro-core](https://github.com/YehhiAleksandra/astro-core)).
+Telegram Mini App for **Зинаида** ([digital-oracle](https://github.com/YehhiAleksandra/digital-oracle)) — quick horoscope and numerology **without LLM** (client-side math, same logic as [astro-core](https://github.com/YehhiAleksandra/astro-core)).
 
 **Live:** [zinaida-mini-app.vercel.app](https://zinaida-mini-app.vercel.app/)
 
@@ -41,3 +41,7 @@ npm run preview
 ## License
 
 MIT
+
+---
+
+<p align="center"><sub><a href="https://github.com/YehhiAleksandra">@YehhiAleksandra</a> · Yehhi Aleksandra · Telegram bots & automation</sub></p>
