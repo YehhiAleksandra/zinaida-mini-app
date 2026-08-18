@@ -168,7 +168,6 @@ function App() {
         </header>
 
         <header className="hero">
-          <div className="orb" style={{ backgroundImage: `url("${still}")` }} />
           <h1>Зинаида</h1>
           <p className="lead">{t.lead}</p>
         </header>
