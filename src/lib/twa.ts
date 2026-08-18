@@ -22,8 +22,8 @@ export function initTelegram(): TelegramWebApp | null {
   try {
     app.ready()
     app.expand()
-    app.setHeaderColor?.('#1a0f2e')
-    app.setBackgroundColor?.('#1a0f2e')
+    app.setHeaderColor?.('#08060c')
+    app.setBackgroundColor?.('#08060c')
   } catch {
     // Outside Telegram or older WebApp client.
   }

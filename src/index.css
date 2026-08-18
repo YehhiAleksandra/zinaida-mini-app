@@ -1,4 +1,30 @@
 :root {
+  --gold: #e4c27a;
+  --gold-deep: #c9a056;
+  --ink: #f6edd8;
+  --muted: rgba(246, 237, 216, 0.72);
+  --night: #08060c;
+  --panel: rgba(18, 14, 24, 0.88);
+  --line: rgba(228, 194, 122, 0.22);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+html {
+  color: var(--ink);
+  background: var(--night);
+  font-family: Onest, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -6,4 +32,12 @@
 
 body {
   margin: 0;
+  color: var(--ink);
+  background: var(--night);
+  overflow-x: hidden;
+}
+
+button,
+input {
+  font: inherit;
 }

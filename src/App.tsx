@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   HOROSCOPE_HINTS,
   numerologySummary,
@@ -6,121 +6,183 @@ import {
   zodiacSummary,
   ZODIAC_SIGNS,
 } from './lib/astro'
+import { copy, HINTS_EN, readLocale, SIGNS_EN, writeLocale } from './lib/copy'
+import type { Locale, Tab } from './lib/copy'
 import { initTelegram, openBot, shareText } from './lib/twa'
 import './App.css'
 
-type Tab = 'horoscope' | 'numerology'
-
 function App() {
   const [tab, setTab] = useState<Tab>('horoscope')
+  const [locale, setLocale] = useState<Locale>(readLocale)
   const [signIdx, setSignIdx] = useState(1)
   const [birthInput, setBirthInput] = useState('17.05.1994')
   const year = new Date().getFullYear()
+  const t = copy[locale]
+  const signs = locale === 'en' ? SIGNS_EN : ZODIAC_SIGNS
+  const hint = locale === 'en' ? HINTS_EN[signIdx] : HOROSCOPE_HINTS[signIdx]
 
   useEffect(() => {
     initTelegram()
   }, [])
 
+  useEffect(() => {
+    document.documentElement.lang = locale
+    writeLocale(locale)
+  }, [locale])
+
   const parsed = useMemo(() => parseBirthDate(birthInput), [birthInput])
   const nums = parsed ? numerologySummary(parsed, year) : null
   const zodiac = parsed ? zodiacSummary(parsed) : null
+  const sunName = zodiac ? signs[zodiac.index] : ''
 
   const shareHoroscope = () => {
-    const sign = ZODIAC_SIGNS[signIdx]
-    shareText(`⭐ ${sign} — ${HOROSCOPE_HINTS[signIdx]}\n\n🔮 Полный расклад в @Zinaidadigitaloracle_bot`)
+    shareText(t.shareHoro(signs[signIdx], hint))
   }
 
   const shareNumerology = () => {
     if (!nums || !zodiac) return
-    shareText(
-      `🔢 Число пути ${nums.lifePath}, год ${nums.personalYear}\n☀️ ${zodiac.name}\n\n🔮 Digital Oracle: @Zinaidadigitaloracle_bot`,
-    )
+    shareText(t.shareNum(nums.lifePath, nums.personalYear, sunName))
   }
 
-  return (
-    <div className="app">
-      <header className="hero">
-        <p className="eyebrow">Digital Oracle</p>
-        <h1>Зинаида</h1>
-        <p className="subtitle">Мини-приложение — быстрый гороскоп и нумерология без LLM</p>
-      </header>
-
-      <nav className="tabs">
-        <button type="button" className={tab === 'horoscope' ? 'active' : ''} onClick={() => setTab('horoscope')}>
-          ⭐ Гороскоп
-        </button>
-        <button type="button" className={tab === 'numerology' ? 'active' : ''} onClick={() => setTab('numerology')}>
-          🔢 Числа
-        </button>
-      </nav>
-
-      {tab === 'horoscope' && (
+  let panel: ReactNode
+  switch (tab) {
+    case 'horoscope':
+      panel = (
         <section className="card">
-          <h2>Знак зодиака</h2>
+          <p className="kicker">01</p>
+          <h2>{t.signTitle}</h2>
           <div className="sign-grid">
-            {ZODIAC_SIGNS.map((sign, i) => (
+            {signs.map((sign, i) => (
               <button
-                key={sign}
+                key={ZODIAC_SIGNS[i]}
                 type="button"
-                className={i === signIdx ? 'sign active' : 'sign'}
+                className={i === signIdx ? 'sign is-on' : 'sign'}
                 onClick={() => setSignIdx(i)}
               >
                 {sign}
               </button>
             ))}
           </div>
-          <p className="hint">{HOROSCOPE_HINTS[signIdx]}</p>
+          <p className="oracle">{hint}</p>
           <div className="actions">
-            <button type="button" className="primary" onClick={shareHoroscope}>
-              Поделиться
+            <button type="button" className="btn" onClick={shareHoroscope}>
+              {t.share}
             </button>
-            <button type="button" className="ghost" onClick={() => openBot('horo')}>
-              Полный гороскоп в боте
+            <button type="button" className="btn ghost" onClick={() => openBot('horo')}>
+              {t.fullHoro}
             </button>
           </div>
         </section>
-      )}
-
-      {tab === 'numerology' && (
+      )
+      break
+    case 'numerology':
+      panel = (
         <section className="card">
-          <h2>Дата рождения</h2>
+          <p className="kicker">02</p>
+          <h2>{t.birthTitle}</h2>
           <input
-            className="input"
+            className="field"
             value={birthInput}
             onChange={(e) => setBirthInput(e.target.value)}
-            placeholder="ДД.ММ.ГГГГ"
+            placeholder={t.birthPh}
             inputMode="numeric"
+            autoComplete="bday"
           />
-          {!parsed && <p className="error">Формат: 17.05.1994</p>}
+          {!parsed && <p className="error">{t.birthErr}</p>}
           {parsed && nums && zodiac && (
             <div className="stats">
               <div>
-                <span>Число пути</span>
+                <span>{t.lifePath}</span>
                 <strong>{nums.lifePath}</strong>
-                {nums.isMaster && <em>мастер-число</em>}
+                {nums.isMaster && <em>{t.master}</em>}
               </div>
               <div>
-                <span>Личный год {year}</span>
+                <span>{t.personalYear(year)}</span>
                 <strong>{nums.personalYear}</strong>
               </div>
               <div>
-                <span>Солнце</span>
-                <strong>{zodiac.name}</strong>
+                <span>{t.sun}</span>
+                <strong>{sunName}</strong>
               </div>
             </div>
           )}
-          <p className="disclaimer">Развлекательный формат · не замена консультации специалиста</p>
+          <p className="disclaimer">{t.disclaimer}</p>
           <div className="actions">
-            <button type="button" className="primary" disabled={!nums} onClick={shareNumerology}>
-              Поделиться
+            <button type="button" className="btn" disabled={!nums} onClick={shareNumerology}>
+              {t.share}
             </button>
-            <button type="button" className="ghost" onClick={() => openBot('num')}>
-              Полная расшифровка в боте
+            <button type="button" className="btn ghost" onClick={() => openBot('num')}>
+              {t.fullNum}
             </button>
           </div>
         </section>
-      )}
-    </div>
+      )
+      break
+    default: {
+      const _exhaustive: never = tab
+      throw new Error(`Unhandled tab: ${_exhaustive}`)
+    }
+  }
+
+  return (
+    <>
+      <div className="stage" aria-hidden="true">
+        <div className="stage-poster" />
+        <div className="vignette" />
+        <div className="corner" />
+      </div>
+
+      <div className="app">
+        <header className="chrome">
+          <p className="mark">Digital Oracle</p>
+          <div className="locale" role="group" aria-label={t.langAria}>
+            <button
+              type="button"
+              className={locale === 'ru' ? 'is-on' : ''}
+              aria-pressed={locale === 'ru'}
+              onClick={() => setLocale('ru')}
+            >
+              RU
+            </button>
+            <button
+              type="button"
+              className={locale === 'en' ? 'is-on' : ''}
+              aria-pressed={locale === 'en'}
+              onClick={() => setLocale('en')}
+            >
+              EN
+            </button>
+          </div>
+        </header>
+
+        <header className="hero">
+          <div className="orb" />
+          <h1>Зинаида</h1>
+          <p className="lead">{t.lead}</p>
+        </header>
+
+        <nav className="tabs" aria-label="Digital Oracle">
+          <button
+            type="button"
+            className={tab === 'horoscope' ? 'is-on' : ''}
+            onClick={() => setTab('horoscope')}
+          >
+            {t.horo}
+          </button>
+          <button
+            type="button"
+            className={tab === 'numerology' ? 'is-on' : ''}
+            onClick={() => setTab('numerology')}
+          >
+            {t.nums}
+          </button>
+        </nav>
+
+        {panel}
+
+        <footer className="by">{t.by}</footer>
+      </div>
+    </>
   )
 }
 
