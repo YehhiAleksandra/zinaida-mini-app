@@ -8,6 +8,7 @@ import {
 } from './lib/astro'
 import { copy, HINTS_EN, readLocale, SIGNS_EN, writeLocale } from './lib/copy'
 import type { Locale, Tab } from './lib/copy'
+import { Atmosphere } from './Atmosphere'
 import { coverData, posterData } from './assets/sphere'
 import { initTelegram, openBot, shareText } from './lib/twa'
 import './App.css'
@@ -188,6 +189,8 @@ function App() {
             {t.nums}
           </button>
         </nav>
+
+        <Atmosphere reduceMotion={reduceMotion} />
 
         {panel}
 
