@@ -8,21 +8,32 @@ import {
 } from './lib/astro'
 import { copy, HINTS_EN, readLocale, SIGNS_EN, writeLocale } from './lib/copy'
 import type { Locale, Tab } from './lib/copy'
+import { coverData, posterData } from './assets/sphere'
 import { initTelegram, openBot, shareText } from './lib/twa'
 import './App.css'
 
 function App() {
   const [tab, setTab] = useState<Tab>('horoscope')
   const [locale, setLocale] = useState<Locale>(readLocale)
+  const [reduceMotion, setReduceMotion] = useState(false)
   const [signIdx, setSignIdx] = useState(1)
   const [birthInput, setBirthInput] = useState('17.05.1994')
   const year = new Date().getFullYear()
   const t = copy[locale]
   const signs = locale === 'en' ? SIGNS_EN : ZODIAC_SIGNS
   const hint = locale === 'en' ? HINTS_EN[signIdx] : HOROSCOPE_HINTS[signIdx]
+  const still = reduceMotion ? coverData : posterData
 
   useEffect(() => {
     initTelegram()
+  }, [])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => setReduceMotion(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
   }, [])
 
   useEffect(() => {
@@ -127,7 +138,7 @@ function App() {
   return (
     <>
       <div className="stage" aria-hidden="true">
-        <div className="stage-poster" />
+        <div className="stage-poster" style={{ backgroundImage: `url("${still}")` }} />
         <div className="vignette" />
         <div className="corner" />
       </div>
@@ -156,7 +167,7 @@ function App() {
         </header>
 
         <header className="hero">
-          <div className="orb" />
+          <div className="orb" style={{ backgroundImage: `url("${still}")` }} />
           <h1>Зинаида</h1>
           <p className="lead">{t.lead}</p>
         </header>
